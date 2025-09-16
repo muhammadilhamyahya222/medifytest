@@ -11,7 +11,7 @@
     $(document).ready(function() {
         $('#table').DataTable({
             searching: false,
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
         });
         getData()
     });
@@ -40,24 +40,42 @@
                 var data = results.data
 
                 $.each(data, function(index, item) {
-                    array_temp = [];
+                    let fotoHtml = 'N/A';
+                    if (item.foto) {
+                        let imageUrl = `{{ asset('storage') }}/${item.foto}`;
+                        fotoHtml = `<img src="${imageUrl}" alt="Foto ${item.nama}" width="60" height="60"`;
+                    }
+
+                    // array_temp = [];
                     var harga_jual = item.harga_beli + item.harga_beli * item.laba / 100;
                     harga_jual = Math.round(harga_jual)
                     var kode = item.kode;
 
                     var html = `<a href="{{url('master-items/view/')}}/` + kode + `" class="btn btn-primary">View</a>`
 
-                    $.each(item, function(obj_name, obj_value) {
-                        if (obj_name == 'laba') return false;
-                        array_temp.push(obj_value)
-                    })
-                    array_temp.push(harga_jual)
-                    array_temp.push(item.supplier)
-                    array_temp.push(html)
+                    // $.each(item, function(obj_name, obj_value) {
+                    //     if (obj_name == 'laba') return false;
+                    //     array_temp.push(obj_value)
+                    // })
+                    // array_temp.push(harga_jual)
+                    // array_temp.push(item.supplier)
+                    // array_temp.push(html)
 
+                    let array_temp = [
+                        fotoHtml,
+                        item.kode,
+                        item.nama,
+                        item.jenis,
+                        item.harga_beli,
+                        harga_jual,
+                        item.supplier,
+                        html,
+                    ];
 
-                    dataTableObj.row.add(array_temp).draw(true);
+                    dataTableObj.row.add(array_temp).draw(false);
                 });
+
+                dataTableObj.draw();
                 $('#loading-filter').hide();
             },
             error: function(xhr, textStatus, errorThrown) {

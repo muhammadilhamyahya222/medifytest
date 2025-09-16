@@ -11,6 +11,17 @@
                 <div class="card-header">Master Item</div>
 
                 <div class="card-body">
+                    <div class="mb-3">
+                        <h4>Foto Item</h4>
+                        @if ($data->foto)
+                            {{-- Jika ada foto, tampilkan gambar dari storage --}}
+                            <img src="{{ asset('storage/' . $data->foto) }}" class="img-fluid rounded" alt="Foto {{ $data->nama }}" style="max-width: 300px;">
+                        @else
+                            {{-- Jika tidak ada foto, tampilkan teks --}}
+                            <p>Tidak ada foto untuk item ini.</p>
+                        @endif
+                    </div>
+                    <hr>
                     <table>
                         <tr>
                             <th>Nama</th>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MasterItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MasterItemsController extends Controller
 {
@@ -23,7 +24,15 @@ class MasterItemsController extends Controller
 
         if (!empty($kode)) $data_search = $data_search->where('kode', $kode);
         if (!empty($nama)) $data_search = $data_search->where('nama', 'LIKE', '%' . $nama . '%');
-        if (!empty($hargamin)) $data_search = $data_search->where('harga_beli', '>=', $hargamin)->where('harga_beli', '<=', $hargamax);
+        // if (!empty($hargamin)) $data_search = $data_search->where('harga_beli', '>=', $hargamin)->where('harga_beli', '<=', $hargamax);
+
+        if (!empty($hargamin) && !empty($hargamax)) {
+            $data_search->whereBetween('harga_beli', [$hargamin, $hargamax]);
+        } else if (!empty($hargamin)) {
+            $data_search->where('harga_beli', ">=", $hargamin);
+        } else if (!empty($hargamax)) {
+            $data_search->where('harga_beli', "<=", $hargamax);
+        }
 
         $data_search = $data_search->select('kode', 'nama', 'jenis', 'harga_beli', 'laba', 'supplier')->orderBy('id')->get();
 
@@ -43,6 +52,7 @@ class MasterItemsController extends Controller
         }
         $data['item'] = $item;
         $data['method'] = $method;
+        $data['kategoris'] = \App\Models\Kategori::all();
         return view('master_items.form.index', $data);
     }
 
@@ -65,6 +75,14 @@ class MasterItemsController extends Controller
             $kode = $data_item->kode;
         }
 
+        if ($request->hasFile('foto')) {
+            if ($method == 'edit' && $data_item->foto) {
+                Storage::disk('public')->delete($data_item->foto);
+            }
+            $path = $request->file('foto')->store('item-photos', 'public');
+            $data_item->foto = $path;
+        }
+
         $data_item->nama = $request->nama;
         $data_item->harga_beli = $request->harga_beli;
         $data_item->laba = $request->laba;
@@ -72,6 +90,12 @@ class MasterItemsController extends Controller
         $data_item->supplier = $request->supplier;
         $data_item->jenis = $request->jenis;
         $data_item->save();
+
+        if ($request->has('kategori_ids')) {
+            $data_item->kategoris()->sync($request->kategori_ids);
+        } else {
+            $data_item->kategoris()->sync([]);
+        }
 
         return redirect('master-items');
     }
