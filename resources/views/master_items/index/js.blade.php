@@ -43,7 +43,7 @@
                     let fotoHtml = 'N/A';
                     if (item.foto) {
                         let imageUrl = `{{ asset('storage') }}/${item.foto}`;
-                        fotoHtml = `<img src="${imageUrl}" alt="Foto ${item.nama}" width="60" height="60"`;
+                        fotoHtml = `<img src="${imageUrl}" alt="Foto ${item.nama}" width="60" height="60 style="object-fit: cover; border-radius: 5px;">`;
                     }
 
                     // array_temp = [];

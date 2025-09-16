@@ -34,7 +34,7 @@ class MasterItemsController extends Controller
             $data_search->where('harga_beli', "<=", $hargamax);
         }
 
-        $data_search = $data_search->select('kode', 'nama', 'jenis', 'harga_beli', 'laba', 'supplier')->orderBy('id')->get();
+        $data_search = $data_search->orderBy('id')->get();
 
 
         return json_encode([
